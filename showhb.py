@@ -1,4 +1,4 @@
-import dssp
+import pydssp as dssp
 from pymol import cmd as cmd
 from pymol import stored as stored
 import numpy as np
@@ -9,14 +9,12 @@ def show_hb(target="all",thre=0,scale=0.25):
     for selection in objs:
         chains=cmd.get_chains(selection)
         for chain in chains:
-            stored.resis = []
-            #print(chain)
+            stored.resis = []  
             cmd.iterate(selection + " and name CA " + " and chain " + chain, "stored.resis.append(resi)")
             resis=np.array(stored.resis)
-            #print(resis)
             x = torch.tensor(cmd.get_coords(selection + " and name n+ca+c+o " + " and chain " + chain).reshape([1, -1, 4, 3]))
             #print(x.shape)
-            hbmap, hcoord = dssp.get_hbond_map(x)
+            _, hcoord = dssp.get_hbond_map(x) # require modified version of pydssp
             count=0
             name = cmd.get_unused_name("dist")
             names=[]
@@ -25,16 +23,13 @@ def show_hb(target="all",thre=0,scale=0.25):
                 names.append(pname)
                 cmd.pseudoatom(object=pname, pos=hcoord[0].tolist()[i_donner])
                 acceptor_resis = resis[(hbmap[0, i_donner + 1, :] > thre) == True]
-                #hbmap_i = hbmap[0,i_donner+1,(hbmap[0, i_donner + 1, :] > thre) == True]
                 i=0
                 for i_acceptor in acceptor_resis:
-                    #prob=hbmap_i[i]
                     resinow = i_acceptor
                     cmd.distance(name,
                                  pname,
                                  selection + " and resi " + resinow + " and name o" + " and chain " + chain
                                  )
-    #            cmd.set("dash_radius", str(scale*prob.item()), "dist"+str(count).zfill(5))
                     i += 1
                     count += 1
             for pname in names:
