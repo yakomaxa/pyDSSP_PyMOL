@@ -7,7 +7,7 @@ https://github.com/ShintaroMinami/PyDSSP
 # Note
 dsspy: assingment of secondary structures.
 
-showhb: show mainchain hydrogen bonding in simillar manner as PyMOL's default. (This requires a small modifications on pydssp )
+showhb: show mainchain hydrogen bonding in simillar manner as PyMOL's default. (This requires small modifications on pydssp )
 
 # License
 
